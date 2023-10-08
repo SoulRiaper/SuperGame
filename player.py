@@ -4,9 +4,9 @@ from settings import *
 
 class Player(pygame.sprite.Sprite):
 
-    def __init__(self, pos, groups, obstacle_sprites):
+    def __init__(self, pos, groups, obstacle_sprites, slowness_sprites):
         super().__init__(groups)
-        self.image = pygame.image.load("./graphics/test/player1.png").convert_alpha()
+        self.image = pygame.image.load("./graphics/test/player.png").convert_alpha()
         self.image = pygame.transform.scale(self.image, (TILESIZE, TILESIZE))
         self.rect = self.image.get_rect(topleft=pos)
 
@@ -14,6 +14,7 @@ class Player(pygame.sprite.Sprite):
         self.speed = 5
 
         self.obstacle_sprites = obstacle_sprites
+        self.slowness_sprites = slowness_sprites
 
         self.hit_box = pygame.rect.Rect((0,0), (TILESIZE // 1.5, TILESIZE // 1.2))
         self.hit_box.midtop = self.rect.midtop
@@ -40,6 +41,9 @@ class Player(pygame.sprite.Sprite):
     def move(self, speed):
         if self.direction.magnitude() != 0:
             self.direction = self.direction.normalize()
+
+        if self.is_slow():
+            speed = speed / 3
 
         self.hit_box.x += self.direction.x * speed
         self.rect.midtop = self.hit_box.midtop
@@ -68,6 +72,12 @@ class Player(pygame.sprite.Sprite):
                         self.hit_box.bottom = sprite.rect.top
                     if self.direction.y < 0:
                         self.hit_box.top = sprite.rect.bottom
+
+    def is_slow(self) -> bool:
+        for sprite in self.slowness_sprites:
+            if sprite.rect.colliderect(self.hit_box):
+                return True
+        return False
 
     def update(self):
         self.move(self.speed)

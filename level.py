@@ -3,6 +3,7 @@ from settings import *
 from tile import Tile
 from player import Player
 from debug import debug
+from slow_tile import SlowTile
 
 
 class Level:
@@ -15,6 +16,7 @@ class Level:
         # sprite group setup
         self.visible_sprites = YSortCameraGroup()
         self.obstacle_sprites = YSortCameraGroup()
+        self.slowness_sprites = YSortCameraGroup()
 
     def create_map(self):
 
@@ -25,14 +27,16 @@ class Level:
 
                 if column == "x":
                     Tile((x, y), [self.visible_sprites, self.obstacle_sprites])
+                elif column == "s":
+                    SlowTile((x, y), [self.visible_sprites, self.slowness_sprites])
                 elif column == "p":
-                    self.player = Player((x, y), [self.visible_sprites], self.obstacle_sprites)
+                    self.player = Player((x, y), [self.visible_sprites], self.obstacle_sprites, self.slowness_sprites)
 
     def run(self):
         # update and draw the game
         self.visible_sprites.custom_draw(self.player)
         self.visible_sprites.update()
-        # debug(self.player.direction)
+        debug(self.player.direction)
 
 
 class YSortCameraGroup(pygame.sprite.Group):
